@@ -5,6 +5,7 @@ import torch
 import torchvision
 from lp_coco_utils.lp_getDataset import getDataset
 from lp_utils.lp_realtime import keypointOnCam
+from lp_config.lp_common_config import config
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
@@ -21,24 +22,23 @@ def parse_args():
 
     return args
 
-def handleResnet(device):
-    model = torchvision.models.detection.keypointrcnn_resnet50_fpn(pretrained=True)
+def handleResnetLive():
+    model = torchvision.models.detection.keypointrcnn_resnet50_fpn(pretrained=True, 
+                                        weights= torchvision.models.detection.KeypointRCNN_ResNet50_FPN_Weights.COCO_V1)
     model.eval()
-    model.to(device)
-    keypointOnCam(model, device, "~/Videos/r1.mp4v")
+    model.to(config["device"])
+    keypointOnCam(model, "~/Videos/r1.mp4v")
 
-def handleTrain(device):
+def handleTrain():
     ds = getDataset("validation")
 
 def main():
     args = parse_args()
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
     if(args.train):
-        handleTrain(device)
-    elif(args.resnet):
-        handleResnet(device)
+        handleTrain()
+    elif(args.resnet_live):
+        handleResnetLive()
     
     
 

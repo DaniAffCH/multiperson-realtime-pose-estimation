@@ -1,11 +1,12 @@
 import cv2 
 import torch
 import numpy as np
+from lp_config.lp_common_config import config
 
 #code partially taken from https://debuggercafe.com/advanced-facial-keypoint-detection-with-pytorch/
 
 @torch.no_grad()
-def keypointOnCam(model, device, savePath, confidenceThreshold = 0):
+def keypointOnCam(model, savePath, confidenceThreshold = 0):
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
     if (cap.isOpened() == False):
         print('Error while trying to open webcam')
@@ -26,12 +27,11 @@ def keypointOnCam(model, device, savePath, confidenceThreshold = 0):
             image = frame
             image = cv2.resize(image, (224, 224))
             orig_frame = image.copy()
-            orig_h, orig_w, c = orig_frame.shape
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image = image / 255.0
             image = np.transpose(image, (2, 0, 1))
             image = torch.tensor(image, dtype=torch.float)
-            image = image.unsqueeze(0).to(device)
+            image = image.unsqueeze(0).to(config["device"])
             outputs = model(image)
             for output in outputs:
                 if(output["keypoints"].shape[0] == 0):
