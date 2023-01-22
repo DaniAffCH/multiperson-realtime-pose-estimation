@@ -1,3 +1,3 @@
-# litepose-keypoint-estimation
+# Litepose keypoint estimation
 
 Work in progress...
