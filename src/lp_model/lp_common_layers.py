@@ -1,4 +1,5 @@
 import torch.nn as nn
+from lp_config.lp_model_config import config
 
 # it must be used always inside a Sequential()
 class ConvBlockBase(nn.Sequential):
@@ -33,4 +34,17 @@ class ConvMobileBlock(nn.Module):
         return self.s(x) + x if self.useResidual else self.s(x) 
 
 class ConvStage(nn.Module):
-    pass
+    def __init__(self, n_stage):
+        super(ConvStage, self).__init__()
+        stageConfig = config["litepose"]["backbone"].stages[n_stage]
+
+        listBlock = []
+
+        for i in range(stageConfig.size):
+            blockConfig = stageConfig.blocks[i]
+            listBlock.append(ConvMobileBlock(blockConfig.in_channels, blockConfig.out_channels, blockConfig.kernel_size, blockConfig.stride))
+        
+        self.stage = nn.Sequential(*listBlock)
+
+    def forward(self, x):
+        return self.stage(x)

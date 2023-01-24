@@ -6,6 +6,7 @@ import torchvision
 from lp_coco_utils.lp_getDataset import getDataset
 from lp_utils.lp_realtime import keypointOnCam
 from lp_config.lp_common_config import config
+from lp_testing.lp_test import test
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
@@ -16,6 +17,10 @@ def parse_args():
 
     parser.add_argument('--resnet-live', 
                         help="use keypoint Resnet50 pretrained model as live detector",
+                        action="store_true")
+
+    parser.add_argument('--test', 
+                        help="just for testing purposes",
                         action="store_true")
 
     args = parser.parse_args()
@@ -32,6 +37,9 @@ def handleResnetLive():
 def handleTrain():
     ds = getDataset("validation")
 
+def handleTest():
+    test()
+
 def main():
     args = parse_args()
 
@@ -39,6 +47,8 @@ def main():
         handleTrain()
     elif(args.resnet_live):
         handleResnetLive()
+    elif(args.test):
+        handleTest()
     
     
 
