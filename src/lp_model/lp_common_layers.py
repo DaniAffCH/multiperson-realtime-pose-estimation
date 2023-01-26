@@ -27,7 +27,7 @@ class ConvMobileBlock(nn.Module):
         self.s = nn.Sequential(
             ConvBlockBase(in_channels, midChannels, 1, activation=False),
             ConvBlockBase(midChannels, midChannels, kernel_size, stride, activation=False),
-            ConvBlockBase(midChannels, midChannels, 1)
+            ConvBlockBase(midChannels, out_channels, 1)
         )
 
     def forward(self, x):

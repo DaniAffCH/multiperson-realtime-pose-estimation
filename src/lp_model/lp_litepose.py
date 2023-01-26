@@ -7,16 +7,17 @@ class LitePose(nn.Module):
         super().__init__()
         conf = config["litepose"]
 
-        # Large kernel convs 
-        self.largek = nn.Sequential(
-            lcl.ConvBlockBase(3, 32, conf["largeKernels"], 2),
-            lcl.ConvBlockBase(32, 16, conf["largeKernels"], 1)
+        in_channels = 16
+
+        self.c1 = nn.Sequential(
+            lcl.ConvBlockBase(3, 32, 3, 2),
+            lcl.ConvBlockBase(32, in_channels, 3, 1)
         )
 
         # Backbone
         backboneConf = conf["backbone"]
         self.stages = []
-        self.channels = []
+        self.channels = [in_channels]
 
         for s in range(backboneConf.size):
             self.stages.append(lcl.ConvStage(s))
@@ -63,7 +64,6 @@ class LitePose(nn.Module):
         self.loopFinal = []
         self.refineFinal = []
         self.finalChannel = []
-
         for l in range(1, deconvConf.size):
             # TODO add tags ???
             self.refineFinal.append(nn.Sequential(
@@ -98,7 +98,7 @@ class LitePose(nn.Module):
     
     def forward(self, x):
         # Large Kernels Convs
-        x = self.largek(x)
+        x = self.c1(x)
 
         # Backbone
         x_checkpoints = [x]

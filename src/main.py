@@ -10,7 +10,7 @@ from lp_testing.lp_test import test
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
-    # general
+
     parser.add_argument('--train',
                         help='train the network on Coco dataset',
                         action='store_true')

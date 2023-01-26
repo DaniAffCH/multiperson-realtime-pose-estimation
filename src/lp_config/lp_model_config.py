@@ -28,44 +28,36 @@ class Deconv_settings():
 
 config = dict(
 
-    litepose = dict(
-        largeKernels = 7,
-        
+    litepose = dict(        
         backbone = Backbone_settings([
             # STAGE 1 
             Stage_settings([
-                MobileBlock_settings(3,32,3,4),
-                MobileBlock_settings(5,6,7,8),
-                MobileBlock_settings(9,10,11,12)
+                MobileBlock_settings(16,16,7,2),
+                MobileBlock_settings(16,32,7,1),
+                MobileBlock_settings(32,16,7,1)
             ]),
             # STAGE 2
             Stage_settings([
-                MobileBlock_settings(3,32,3,4),
-                MobileBlock_settings(5,6,7,8),
-                MobileBlock_settings(9,10,11,12)
+                MobileBlock_settings(16,64,7,2),
+                MobileBlock_settings(64,64,7,1),
+                MobileBlock_settings(64,32,7,1)
             ]),
             # STAGE 3
             Stage_settings([
-                MobileBlock_settings(3,32,3,4),
-                MobileBlock_settings(5,6,7,8),
-                MobileBlock_settings(9,10,11,12)
+                MobileBlock_settings(32,64,7,2),
+                MobileBlock_settings(64,64,7,1),
+                MobileBlock_settings(64,48,7,1),
             ]),
             # STAGE 4
             Stage_settings([
-                MobileBlock_settings(3,32,3,4),
-                MobileBlock_settings(5,6,7,8),
-                MobileBlock_settings(9,10,11,12)
-            ]),
-            # STAGE 5
-            Stage_settings([
-                MobileBlock_settings(3,32,3,4),
-                MobileBlock_settings(5,6,7,8),
-                MobileBlock_settings(9,10,11,12)
+                MobileBlock_settings(48,64,7,1),
+                MobileBlock_settings(64,64,7,1),
+                MobileBlock_settings(64,80,7,1)
             ])
         ]),
 
-        # deconvLayers must be <= #stages - 2
-        deconvLayers = Deconv_settings([64, 32, 16], [3,4,3]),
+        # #deconvLayers must be <= #stages - 2
+        deconvLayers = Deconv_settings([16, 24, 24], [4,4,4]),
 
         joints = 17
     )
