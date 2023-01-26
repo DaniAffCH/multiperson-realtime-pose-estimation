@@ -119,4 +119,4 @@ class LitePose(nn.Module):
                 finalLoop = self.loopFinal[l-1](x_checkpoints[-l-3])
                 outputs.append(finalForward+finalLoop)
 
-        return x
+        return outputs

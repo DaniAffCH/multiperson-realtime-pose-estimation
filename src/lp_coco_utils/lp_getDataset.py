@@ -16,7 +16,7 @@ from pycocotools.cocoeval import COCOeval
 import zipfile
 
 from lp_coco_utils import lp_transform as T
-from lp_coco_utils.generators import HeatmapGenerator, JointsGenerator
+from lp_coco_utils.lp_generators import HeatmapGenerator, JointsGenerator
 
 
 DATASET_ROOT = "/home/daniaffch/Uni/Neural_Networks/LitePose/dataset/coco"

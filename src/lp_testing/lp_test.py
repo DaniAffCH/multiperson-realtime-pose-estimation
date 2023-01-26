@@ -1,5 +1,6 @@
 from lp_coco_utils.lp_getDataset import getDatasetProcessed
 from lp_model.lp_litepose import LitePose
+from lp_training.lp_trainOne import trainOneEpoch
 from PIL import Image
 from torchvision.transforms import functional as func
 from lp_config.lp_common_config import config
@@ -38,7 +39,7 @@ def test():
     tot+=1 
 
     try:
-        model = LitePose().to()
+        model = LitePose()
         print("[TEST] Model loading... "+ok)
         passed+=1
     except Exception as e: 
@@ -46,7 +47,6 @@ def test():
         print(e)
     tot+=1 
 
-    #TODO: model feedforward
     try:
         for row in data_loader:
             images = row[0]
@@ -60,5 +60,18 @@ def test():
         print("[TEST] Model feedforward scale invariant... "+no)
         print(e)
     tot+=1 
+
+    try:
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.5)
+
+        trainOneEpoch(model, data_loader, optimizer, 1, True)
+        print("[TEST] Train step.... "+ok)
+        passed+=1
+
+    except Exception as e: 
+        print("[TEST] Train step... "+no)
+        print(e)
+    tot+=1 
+
 
     print(f"[TEST] {passed}/{tot} tests passed")
