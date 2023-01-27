@@ -4,56 +4,21 @@ import fiftyone as fo
 from collections import defaultdict
 from collections import OrderedDict
 import logging
-import os
 import os.path
-
 import cv2
 import json_tricks as json
 import numpy as np
 from torch.utils.data import Dataset
-
 from pycocotools.cocoeval import COCOeval
+import pycocotools
 import zipfile
 
 from lp_coco_utils import lp_transform as T
 from lp_coco_utils.lp_generators import HeatmapGenerator, JointsGenerator
 
-
-DATASET_ROOT = "/home/daniaffch/Uni/Neural_Networks/LitePose/dataset/coco"
-DATA_FORMAT = "jpg"
-
-def getDataset(split, dataset_name="litepose-coco", fiftyonepath=os.path.join(os.environ.get("HOME"),"fiftyone")):
-
-    def _cleanNone(ds):
-        remIds = [p["id"] for p in (iter(ds)) if p["keypoints"] == None]
-        ds.delete_samples(remIds)
-
-    # download the dataset if it doesn't exist
-    dataset = foz.load_zoo_dataset(
-        "coco-2017",
-        split=split,
-        dataset_name=dataset_name
-    )
-
-    labels_file = os.path.join(fiftyonepath, "coco-2017/raw/person_keypoints_val2017.json")
-    dataset_file = os.path.join(fiftyonepath, "coco-2017/validation")
-
-    ds = fo.Dataset.from_dir(
-        dataset_type = fo.types.COCODetectionDataset,
-        label_types = ["detections", "keypoints"],
-        dataset_dir = dataset_file,
-        labels_path = labels_file
-    )
-
-    ds.persistent = True
-
-    print("Dataset cleaning...")
-    _cleanNone(ds)
-    print("Done!")
-
-    return ds
-
 logger = logging.getLogger(__name__)
+
+DATA_FORMAT = "jpg"
 
 def myimread(filename, flags=cv2.IMREAD_COLOR):
     global _im_zfile
@@ -122,30 +87,30 @@ class CocoDataset(Dataset):
     def _get_anno_file_name(self):
         # example: root/annotations/person_keypoints_tran2017.json
         # image_info_test-dev2017.json
-        if 'test' in self.dataset:
+        if(self.dataset == "validation"):
             return os.path.join(
                 self.root,
-                'annotations',
-                'image_info_{}.json'.format(
-                    self.dataset
-                )
+                'coco-2017/raw',
+                'person_keypoints_val2017.json'
+            )
+        elif 'test' in self.dataset:
+            return os.path.join(
+                self.root,
+                'coco-2017/raw',
+                'image_info_test2017.json'
             )
         else:
             return os.path.join(
                 self.root,
-                'annotations',
-                'person_keypoints_{}.json'.format(
+                'coco-2017/raw',
+                'person_keypoints_{}2017.json'.format(
                     self.dataset
                 )
             )
 
     def _get_image_path(self, file_name):
-        images_dir = os.path.join(self.root, 'images')
-        dataset = 'test2017' if 'test' in self.dataset else self.dataset
-        if self.data_format == 'zip':
-            return os.path.join(images_dir, dataset) + '.zip@' + file_name
-        else:
-            return os.path.join(images_dir, dataset, file_name)
+        images_dir = os.path.join(self.root, 'coco-2017')
+        return os.path.join(images_dir, self.dataset, "data", file_name)
 
     def __getitem__(self, index):
         """
@@ -355,25 +320,15 @@ class CocoDataset(Dataset):
             # info_str.append(coco_eval.stats[ind])
 
         return info_str
-
-
-import logging
-
-import numpy as np
-
-import pycocotools
-
-
-logger = logging.getLogger(__name__)
-
 class CocoKeypoints(CocoDataset):
     def __init__(self,
+                 root,
                  dataset_name,
                  remove_images_without_annotations,
                  heatmap_generator,
                  joints_generator,
                  transforms=None):
-        super().__init__(DATASET_ROOT,
+        super().__init__(root,
                          dataset_name,
                          DATA_FORMAT)
 
@@ -470,7 +425,16 @@ class CocoKeypoints(CocoDataset):
             )
         return len(heatmap_generator)
 
-def getDatasetProcessed():
+def getDatasetProcessed(split, dataset_name="litepose-coco", fiftyonepath=os.path.join(os.environ.get("HOME"),"fiftyone")):
+
+    if split not in ["train", "validation", "test"]:
+        raise Exception(f"Expected a dataset split train, validation or test, given {split}")
+
+    foz.download_zoo_dataset(
+        "coco-2017",
+        split=split
+    )
+
     hm = [
     HeatmapGenerator(
             output_size, 17, 2
@@ -504,4 +468,4 @@ def getDatasetProcessed():
             ]
         )
 
-    return CocoKeypoints("val2017",True,hm,j,transforms)
+    return CocoKeypoints(fiftyonepath,split,True,hm,j,transforms)

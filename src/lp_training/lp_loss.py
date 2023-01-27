@@ -2,7 +2,7 @@ import numpy as np
 
 def heatmapMSE(y_pred, y_true):
     loss = (y_pred - y_true)**2
-    return loss.mean(dim=3).mean(dim=2).mean(dim=1).mean(dim=0)
+    return loss.mean(dim=3).mean(dim=2).mean(dim=1)
 
 def computeLoss(y_preds, y_trues):
     loss = 0

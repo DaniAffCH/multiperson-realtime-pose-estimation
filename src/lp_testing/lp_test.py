@@ -1,6 +1,7 @@
 from lp_coco_utils.lp_getDataset import getDatasetProcessed
 from lp_model.lp_litepose import LitePose
 from lp_training.lp_trainOne import trainOneEpoch
+from lp_training.lp_earlyStop import EarlyStopping
 from PIL import Image
 from torchvision.transforms import functional as func
 from lp_config.lp_common_config import config
@@ -18,7 +19,7 @@ def test():
     tot = 0
 
     try:
-        ds = getDatasetProcessed()
+        ds = getDatasetProcessed("train")
         print("[TEST] Dataset loading and preprocessing... "+ok)
         passed+=1
     except Exception as e: 
@@ -39,7 +40,7 @@ def test():
     tot+=1 
 
     try:
-        model = LitePose()
+        model = LitePose().to(config["device"])
         print("[TEST] Model loading... "+ok)
         passed+=1
     except Exception as e: 
@@ -52,7 +53,8 @@ def test():
             images = row[0]
             img_size = 256 + random.randint(0, 4) * 64
             images = F.interpolate(images, size = (img_size, img_size))
-            preds = model(images)
+            images = images.to(config["device"])
+            model(images)
             print("[TEST] Model feedforward scale invariant... "+ok)
             passed+=1
             break
@@ -63,8 +65,9 @@ def test():
 
     try:
         optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.5)
+        er = EarlyStopping(model, 1e-5, 10)
 
-        trainOneEpoch(model, data_loader, optimizer, 1, True)
+        trainOneEpoch(model, data_loader, optimizer, er, 1, True)
         print("[TEST] Train step.... "+ok)
         passed+=1
 

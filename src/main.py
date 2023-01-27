@@ -3,10 +3,10 @@ from __future__ import absolute_import
 import argparse
 import torch
 import torchvision
-from lp_coco_utils.lp_getDataset import getDataset
 from lp_utils.lp_realtime import keypointOnCam
 from lp_config.lp_common_config import config
 from lp_testing.lp_test import test
+from lp_training.lp_trainer import train
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train keypoints network')
@@ -35,7 +35,7 @@ def handleResnetLive():
     keypointOnCam(model, "~/Videos/r1.mp4v")
 
 def handleTrain():
-    ds = getDataset("validation")
+    train(8)
 
 def handleTest():
     test()
