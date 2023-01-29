@@ -14,15 +14,16 @@ def trainOneEpoch(model, dataloader, optimizer, earlyStopper, epoch, testing=Fal
         y_pred = model(images)
         loss = computeLoss(y_pred, heatmaps)
         loss = loss.mean(axis=0)
+        lossavg += float(loss)
         loss.backward()
         optimizer.step()
-
-        print(f"Batch {i} the current loss is {loss}")
         
         if(testing):
             break
+
+    lossavg /= len(dataloader)
         
-        if(earlyStopper(loss)):
-            return True
+    if(earlyStopper(lossavg)):
+        return True, lossavg
     
-    return False
+    return False, lossavg

@@ -57,8 +57,6 @@ config = dict(
         ]),
 
         # #deconvLayers must be <= #stages - 2
-        deconvLayers = Deconv_settings([16, 24, 24], [4,4,4]),
-
-        joints = 17
+        deconvLayers = Deconv_settings([16, 24, 24], [4,4,4])
     )
 )

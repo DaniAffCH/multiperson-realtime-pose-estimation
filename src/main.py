@@ -35,7 +35,7 @@ def handleResnetLive():
     keypointOnCam(model, "~/Videos/r1.mp4v")
 
 def handleTrain():
-    train(8)
+    train(config["batch_size"])
 
 def handleTest():
     test()

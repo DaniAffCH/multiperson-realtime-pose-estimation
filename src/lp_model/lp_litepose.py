@@ -1,4 +1,5 @@
 from lp_config.lp_model_config import config
+import lp_config.lp_common_config as cmc
 import torch
 from torch import nn 
 import lp_model.lp_common_layers as lcl
@@ -68,12 +69,12 @@ class LitePose(nn.Module):
             # TODO add tags ???
             self.refineFinal.append(nn.Sequential(
                 lcl.ConvBlockBase(deconvConf.channels[l], deconvConf.channels[l], 5),
-                lcl.ConvBlockBase(deconvConf.channels[l], conf["joints"], 5)
+                lcl.ConvBlockBase(deconvConf.channels[l], cmc.config["num_joints"], 5)
             ))
 
             self.loopFinal.append(nn.Sequential(
                 lcl.ConvBlockBase(self.channels[-l-3], self.channels[-l-3], 5),
-                lcl.ConvBlockBase(self.channels[-l-3], conf["joints"], 5)
+                lcl.ConvBlockBase(self.channels[-l-3], cmc.config["num_joints"], 5)
             ))
 
         self.refineFinal = nn.ModuleList(self.refineFinal)

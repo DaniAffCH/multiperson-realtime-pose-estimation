@@ -15,6 +15,7 @@ import zipfile
 
 from lp_coco_utils import lp_transform as T
 from lp_coco_utils.lp_generators import HeatmapGenerator, JointsGenerator
+from lp_config.lp_common_config import config
 
 logger = logging.getLogger(__name__)
 
@@ -268,7 +269,7 @@ class CocoDataset(Dataset):
         cat_id = data_pack['cat_id']
         keypoints = data_pack['keypoints']
         cat_results = []
-        num_joints = 17
+        num_joints = config["num_joints"]
 
         for img_kpts in keypoints:
             if len(img_kpts) == 0:
@@ -333,11 +334,9 @@ class CocoKeypoints(CocoDataset):
                          DATA_FORMAT)
 
 
-        # num joints is 17
-
         self.num_scales = self._init_check(heatmap_generator, joints_generator)
 
-        self.num_joints = 17
+        self.num_joints = config["num_joints"]
         self.with_center = False
         self.num_joints_without_center = self.num_joints - 1 \
             if self.with_center else self.num_joints
@@ -437,14 +436,14 @@ def getDatasetProcessed(split, dataset_name="litepose-coco", fiftyonepath=os.pat
 
     hm = [
     HeatmapGenerator(
-            output_size, 17, 2
+            output_size, config["num_joints"], 2
         ) for output_size in [64, 128]
     ]
 
     j = [
         JointsGenerator(
             30,
-            17,
+            config["num_joints"],
             output_size,
             True
         ) for output_size in [64, 128]
