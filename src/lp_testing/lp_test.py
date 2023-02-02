@@ -1,14 +1,13 @@
 from lp_coco_utils.lp_getDataset import getDatasetProcessed
 from lp_model.lp_litepose import LitePose
 from lp_training.lp_trainOne import trainOneEpoch
-from lp_training.lp_earlyStop import EarlyStopping
-from PIL import Image
-from torchvision.transforms import functional as func
 from lp_config.lp_common_config import config
+from lp_training.lp_inference import inference
+import lp_utils.lp_image_processing as ip 
 import torch.nn.functional as F
 import random
 import torch
-
+import cv2
 def test():
     ok = "\033[92m[PASSED]\033[0m"
     no = "\033[91m[FAILED]\033[0m"
@@ -49,6 +48,7 @@ def test():
     tot+=1 
 
     try:
+        assert(len(data_loader) > 0)
         for row in data_loader:
             images = row[0]
             img_size = 256 + random.randint(0, 4) * 64
@@ -65,16 +65,34 @@ def test():
 
     try:
         optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.5)
-        er = EarlyStopping(model, 1e-5, 10)
 
-        trainOneEpoch(model, data_loader, optimizer, er, 1, True)
-        print("[TEST] Train step.... "+ok)
+        trainOneEpoch(model, data_loader, optimizer, 1, True)
+        print("[TEST] Train step... "+ok)
         passed+=1
 
     except Exception as e: 
         print("[TEST] Train step... "+no)
         print(e)
     tot+=1 
+
+    model.load_state_dict(torch.load("definitive1"))
+    images = None
+    heatmaps = None
+
+    try:
+        row = next(iter(data_loader))
+        test_img = row[0][0].numpy().transpose(1, 2, 0)
+        images = row[0].to(config["device"])
+        heatmaps = row[1]
+        keypoints = inference(model, images)
+        assert len(keypoints)>0
+        print("[TEST] Inference... "+ok)
+        passed+=1
+    except Exception as e: 
+        print("[TEST] Inference... "+no)
+        print(e)
+    tot+=1 
+
 
 
     print(f"[TEST] {passed}/{tot} tests passed")

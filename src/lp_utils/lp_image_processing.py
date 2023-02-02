@@ -1,0 +1,51 @@
+import torch
+import numpy as np
+import cv2
+
+def normalizeImage(img):
+    return img/img.max()*255 if img.max() > 0 else img
+
+def getMostPromisingPoint(heatmap, isTensor = False):
+    hm = torch.tensor(heatmap) if not isTensor else heatmap
+    _,w = hm.shape
+    hm = hm.view(-1)
+    _, mostPromisingPoint = hm.topk(1)
+    return torch.cat(((mostPromisingPoint % w).unsqueeze(1), (mostPromisingPoint // w).unsqueeze(1)), dim=1)[0]
+
+def mergeMultipleHeatmaps(heatmaps):
+    hm = np.mean(heatmaps, axis=0)
+    return hm
+
+
+"""
+    @param img: Torch tensor of shape [ch,w,h]
+    @param b: scalar (representing a square image)
+"""
+def scaleImage(img, output_size):
+    sf = output_size/img.shape[1]
+    img = img.unsqueeze(0)
+    scaled = torch.nn.functional.interpolate(img,scale_factor=sf, mode='bilinear')
+    return scaled[0]
+
+def drawKeypoints(img, keypoints):
+    # image = cv2.circle(image, (int(true[0]),int(true[1])), radius=5, color=(0, 0, 255), thickness=-1)
+    pass
+
+def drawHeatmap(img, heatmaps):
+    img = img.cpu().numpy().transpose(1, 2, 0)
+    img = normalizeImage(img)
+    img = np.uint8(img)
+    heatmaps = scaleImage(heatmaps, img.shape[1]).cpu().numpy()
+
+    finalHm = mergeMultipleHeatmaps(heatmaps)
+    finalHm = normalizeImage(finalHm)
+    finalHm = cv2.applyColorMap(np.uint8(finalHm), cv2.COLORMAP_JET)
+    superimposed = cv2.addWeighted(finalHm, 0.5, img, 0.5, 0)
+
+    cv2.imshow("Image", img)
+    cv2.imshow("Final heatmap", finalHm)
+    cv2.imshow("Superimposed", superimposed)
+    cv2.waitKey()
+
+#heatmaps = list(map(lambda x: normalizeImage(x) , heatmaps))
+#heatmaps[0] = cv2.applyColorMap(np.uint8(heatmaps[0]), cv2.COLORMAP_JET)

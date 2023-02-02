@@ -11,7 +11,6 @@ import numpy as np
 from torch.utils.data import Dataset
 from pycocotools.cocoeval import COCOeval
 import pycocotools
-import zipfile
 
 from lp_coco_utils import lp_transform as T
 from lp_coco_utils.lp_generators import HeatmapGenerator, JointsGenerator
@@ -20,31 +19,6 @@ from lp_config.lp_common_config import config
 logger = logging.getLogger(__name__)
 
 DATA_FORMAT = "jpg"
-
-def myimread(filename, flags=cv2.IMREAD_COLOR):
-    global _im_zfile
-    path = filename
-    pos_at = path.index('@')
-    if pos_at == -1:
-        print("character '@' is not found from the given path '%s'"%(path))
-        assert 0
-    path_zip = path[0: pos_at]
-    path_img = path[pos_at + 1:]
-    if not os.path.isfile(path_zip):
-        print("zip file '%s' is not found"%(path_zip))
-        assert 0
-    for i in range(len(_im_zfile)):
-        if _im_zfile[i]['path'] == path_zip:
-            data = _im_zfile[i]['zipfile'].read(path_img)
-            return cv2.imdecode(np.frombuffer(data, np.uint8), flags)
-
-    _im_zfile.append({
-        'path': path_zip,
-        'zipfile': zipfile.ZipFile(path_zip, 'r')
-    })
-    data = _im_zfile[-1]['zipfile'].read(path_img)
-
-    return cv2.imdecode(np.frombuffer(data, np.uint8), flags)
 
 class CocoDataset(Dataset):
     """`MS Coco Detection <http://mscoco.org/dataset/#detections-challenge2016>`_ Dataset.
@@ -127,13 +101,11 @@ class CocoDataset(Dataset):
         target = coco.loadAnns(ann_ids)
 
         file_name = coco.loadImgs(img_id)[0]['file_name']
-
         img = cv2.imread(
             self._get_image_path(file_name),
             cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION
         )
 
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         if self.transform is not None:
             img = self.transform(img)
@@ -286,7 +258,7 @@ class CocoDataset(Dataset):
             for ipt in range(num_joints):
                 key_points[:, ipt * 3 + 0] = _key_points[:, ipt, 0]
                 key_points[:, ipt * 3 + 1] = _key_points[:, ipt, 1]
-                key_points[:, ipt * 3 + 2] = _key_points[:, ipt, 2]  # keypoints score.
+                key_points[:, ipt * 3 + 2] = _key_points[:, ipt, 2]
 
             for k in range(len(img_kpts)):
                 kpt = key_points[k].reshape((num_joints, 3))
@@ -362,7 +334,6 @@ class CocoKeypoints(CocoDataset):
             if obj['iscrowd'] == 0 or obj['num_keypoints'] > 0
         ]
 
-        # TODO(bowen): to generate scale-aware sigma, modify `get_joints` to associate a sigma to each joint
         joints = self.get_joints(anno)
 
         mask_list = [mask.copy() for _ in range(self.num_scales)]
@@ -462,8 +433,7 @@ def getDatasetProcessed(split, dataset_name="litepose-coco", fiftyonepath=os.pat
                     scale_aware_sigma=None
                 ),
                 T.RandomHorizontalFlip([0, 2, 1, 4, 3, 6, 5, 8, 7, 10, 9, 12, 11, 14, 13, 16, 15], [64, 128], 0.5),
-                T.ToTensor(),
-                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+                T.ToTensor()
             ]
         )
 

@@ -9,6 +9,6 @@ config = dict(
     batch_size = 32,
     earlyStop_eps = 1e-4,
     earlyStop_threshold = 5,
-    backup_name = "2901",
+    backup_name = "definitive1",
     num_joints = 17
 )
