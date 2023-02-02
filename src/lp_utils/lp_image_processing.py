@@ -28,8 +28,9 @@ def scaleImage(img, output_size):
     return scaled[0]
 
 def drawKeypoints(img, keypoints):
-    # image = cv2.circle(image, (int(true[0]),int(true[1])), radius=5, color=(0, 0, 255), thickness=-1)
-    pass
+    for kp in keypoints:
+        img = cv2.circle(img, (int(kp[0]),int(kp[1])), radius=5, color=(0, 0, 255), thickness=-1)
+    return img
 
 def drawHeatmap(img, heatmaps):
     img = img.cpu().numpy().transpose(1, 2, 0)
@@ -42,10 +43,7 @@ def drawHeatmap(img, heatmaps):
     finalHm = cv2.applyColorMap(np.uint8(finalHm), cv2.COLORMAP_JET)
     superimposed = cv2.addWeighted(finalHm, 0.5, img, 0.5, 0)
 
-    cv2.imshow("Image", img)
-    cv2.imshow("Final heatmap", finalHm)
-    cv2.imshow("Superimposed", superimposed)
-    cv2.waitKey()
+    return img, finalHm, superimposed
 
 #heatmaps = list(map(lambda x: normalizeImage(x) , heatmaps))
 #heatmaps[0] = cv2.applyColorMap(np.uint8(heatmaps[0]), cv2.COLORMAP_JET)

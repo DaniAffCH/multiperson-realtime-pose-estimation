@@ -81,9 +81,7 @@ def test():
 
     try:
         row = next(iter(data_loader))
-        test_img = row[0][0].numpy().transpose(1, 2, 0)
         images = row[0].to(config["device"])
-        heatmaps = row[1]
         keypoints = inference(model, images)
         assert len(keypoints)>0
         print("[TEST] Inference... "+ok)
