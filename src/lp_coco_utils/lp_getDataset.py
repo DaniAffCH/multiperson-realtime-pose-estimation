@@ -413,7 +413,7 @@ def getDatasetProcessed(split, dataset_name="litepose-coco", fiftyonepath=os.pat
 
     j = [
         JointsGenerator(
-            30,
+            config["max_people"],
             config["num_joints"],
             output_size,
             True

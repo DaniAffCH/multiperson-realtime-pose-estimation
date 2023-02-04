@@ -26,7 +26,8 @@ def train(batch_size):
 
     model = LitePose().to(config["device"])
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=config["learning_rate"], momentum=config["momentum"])
+    optimizer = torch.optim.Adam(model.parameters(),lr=config["learning_rate"])
+    #optimizer = torch.optim.SGD(model.parameters(), lr=config["learning_rate"], momentum=config["momentum"])
     es = EarlyStopping(model, config["earlyStop_eps"], config["earlyStop_threshold"], config["backup_name"])
 
     start_time = time.time()
@@ -37,16 +38,26 @@ def train(batch_size):
         val_loss_l = []
         with torch.no_grad():
             model.eval()
-            for images, heatmaps, _, _ in tqdm.tqdm(val_data_loader):
+            for images, heatmaps, masks, joints in tqdm.tqdm(val_data_loader):
                 images = images.to(config["device"])
                 heatmaps = [h.to(config["device"]) for h in heatmaps]
+                joints = [j.to(config["device"]) for j in joints]
+                masks = [m.to(config["device"]) for m in masks]
                 y_pred = model(images)
-                val_loss = computeLoss(y_pred, heatmaps)
-                val_loss = val_loss.mean(axis=0)
-                val_loss_l.append(val_loss)
+
+                heatmapLoss, tagLoss = computeLoss(y_pred, heatmaps, masks, joints)
+                totLoss = 0
+                
+                for scaleIdx in range(len(heatmapLoss)):
+                    hl = heatmapLoss[scaleIdx].mean(0)
+                    totLoss+=hl
+                    tl = tagLoss[scaleIdx].mean(0)
+                    totLoss+=tl
+
+                val_loss_l.append(totLoss)
             val_loss_avg = sum(val_loss_l)/len(val_loss_l)
 
-        print(f"epoch #{i} training loss {train_loss}   validation loss {val_loss_avg}")
+        print(f"epoch #{i+1} training loss {train_loss}   validation loss {val_loss_avg}")
 
         if(es(val_loss_avg)):
             break

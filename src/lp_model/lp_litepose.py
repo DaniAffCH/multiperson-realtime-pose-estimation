@@ -66,15 +66,15 @@ class LitePose(nn.Module):
         self.refineFinal = []
         self.finalChannel = []
         for l in range(1, deconvConf.size):
-            # TODO add tags ???
+            # 2*num_joints: num_joints channels represent heatmaps for each joint, the others num_joints channels are the tags 
             self.refineFinal.append(nn.Sequential(
                 lcl.ConvBlockBase(deconvConf.channels[l], deconvConf.channels[l], 5),
-                lcl.ConvBlockBase(deconvConf.channels[l], cmc.config["num_joints"], 5)
+                lcl.ConvBlockBase(deconvConf.channels[l], 2*cmc.config["num_joints"], 5)
             ))
 
             self.loopFinal.append(nn.Sequential(
                 lcl.ConvBlockBase(self.channels[-l-3], self.channels[-l-3], 5),
-                lcl.ConvBlockBase(self.channels[-l-3], cmc.config["num_joints"], 5)
+                lcl.ConvBlockBase(self.channels[-l-3], 2*cmc.config["num_joints"], 5)
             ))
 
         self.refineFinal = nn.ModuleList(self.refineFinal)

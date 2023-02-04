@@ -28,6 +28,9 @@ def scaleImage(img, output_size):
     return scaled[0]
 
 def drawKeypoints(img, keypoints):
+    img = img.cpu().numpy().transpose(1, 2, 0)
+    img = normalizeImage(img)
+    img = img.astype(np.uint8).copy() 
     for kp in keypoints:
         img = cv2.circle(img, (int(kp[0]),int(kp[1])), radius=5, color=(0, 0, 255), thickness=-1)
     return img

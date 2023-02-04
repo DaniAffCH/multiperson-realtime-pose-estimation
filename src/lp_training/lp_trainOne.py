@@ -6,15 +6,24 @@ def trainOneEpoch(model, dataloader, optimizer, epoch, testing=False):
     lossavg = 0
     loss_l = []
     model.train()
-    for i, (images, heatmaps, masks, joints) in tqdm.tqdm(enumerate(dataloader)):
+    for images, heatmaps, masks, joints in tqdm.tqdm(dataloader):
         optimizer.zero_grad()
         images = images.to(config["device"])
         heatmaps = [h.to(config["device"]) for h in heatmaps]
+        joints = [j.to(config["device"]) for j in joints]
+        masks = [m.to(config["device"]) for m in masks]
         y_pred = model(images)
-        loss = computeLoss(y_pred, heatmaps)
-        loss = loss.mean(axis=0)
-        loss_l.append(float(loss))
-        loss.backward()
+        heatmapLoss, tagLoss = computeLoss(y_pred, heatmaps, masks, joints)
+        totLoss = 0
+
+        for scaleIdx in range(len(heatmapLoss)):
+            hl = heatmapLoss[scaleIdx].mean(0)
+            totLoss+=hl
+            tl = tagLoss[scaleIdx].mean(0)
+            totLoss+=tl
+
+        loss_l.append(float(totLoss))
+        totLoss.backward()
         optimizer.step()
         
         if(testing):
