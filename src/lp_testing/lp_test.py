@@ -2,7 +2,7 @@ from lp_coco_utils.lp_getDataset import getDatasetProcessed
 from lp_model.lp_litepose import LitePose
 from lp_training.lp_trainOne import trainOneEpoch
 from lp_config.lp_common_config import config
-from lp_training.lp_inference import inference
+from lp_inference.lp_inference import inference
 import lp_utils.lp_image_processing as ip 
 import torch.nn.functional as F
 import random
@@ -30,7 +30,7 @@ def test():
     try:
         data_loader = torch.utils.data.DataLoader(
             ds,
-            batch_size=2
+            batch_size=4
         )
         print("[TEST] Data Loader... "+ok)
         passed+=1

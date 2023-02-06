@@ -3,8 +3,6 @@ import torch
 import numpy as np
 from lp_config.lp_common_config import config
 
-#code partially taken from https://debuggercafe.com/advanced-facial-keypoint-detection-with-pytorch/
-
 @torch.no_grad()
 def keypointOnCam(model, savePath, confidenceThreshold = 0):
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
@@ -52,7 +50,7 @@ def keypointOnCam(model, savePath, confidenceThreshold = 0):
                 orig_frame = cv2.resize(orig_frame, (frame_width, frame_height))
             cv2.imshow('Keypoint Frame', orig_frame)
             out.write(orig_frame)
-            # press `q` to exit
+
             if cv2.waitKey(27) & 0xFF == ord('q'):
                 break
     

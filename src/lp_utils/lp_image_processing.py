@@ -31,14 +31,18 @@ def drawKeypoints(img, keypoints):
     img = img.cpu().numpy().transpose(1, 2, 0)
     img = normalizeImage(img)
     img = img.astype(np.uint8).copy() 
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
     for kp in keypoints:
-        img = cv2.circle(img, (int(kp[0]),int(kp[1])), radius=5, color=(0, 0, 255), thickness=-1)
+        for n,person in enumerate(kp):
+            img = cv2.circle(img, (int(person[0]),int(person[1])), radius=3, color=(0, 0, 255), thickness=-1)
     return img
 
 def drawHeatmap(img, heatmaps):
     img = img.cpu().numpy().transpose(1, 2, 0)
     img = normalizeImage(img)
     img = np.uint8(img)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     heatmaps = scaleImage(heatmaps, img.shape[1]).cpu().numpy()
 
     finalHm = mergeMultipleHeatmaps(heatmaps)

@@ -36,7 +36,7 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 
     # First term L
 
-    diff = (realtags - mean_h)**2
+    diff = (mean_h-realtags)**2
     diff *= validJoints
 
     aggregate = diff.sum(2, keepdim=True)/joint_perPerson
@@ -44,7 +44,7 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 
     aggregate = aggregate.squeeze(2).sum(1, keepdim=True)/person_cnt
 
-    tagmse = aggregate.mean(0)
+    tagmse = aggregate.squeeze(1)
 
     # Second term L
 
@@ -54,13 +54,13 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 
     repMatrixTrasnspose = repMatrix.transpose(1,2)
 
-    diffElementwise = repMatrix-repMatrixTrasnspose # skewsymmetric matrices, this can be improved by exploiting this property 
+    diffElementwise = torch.square(repMatrix-repMatrixTrasnspose) # symmetric matrices, this can be improved by exploiting this property 
 
     diffElementwise *= -1/(2*OMEGA)
 
     diffElementwise = torch.exp(diffElementwise)
 
-    tagexp = diffElementwise.mean(2).mean(1).mean(0)
+    tagexp = diffElementwise.mean(2).mean(1)
 
     return tagexp+tagmse
 
