@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import random
 import torch
 import cv2
+
 def test():
     ok = "\033[92m[PASSED]\033[0m"
     no = "\033[91m[FAILED]\033[0m"
@@ -29,7 +30,7 @@ def test():
     try:
         data_loader = torch.utils.data.DataLoader(
             ds,
-            batch_size=8
+            batch_size=2
         )
         print("[TEST] Data Loader... "+ok)
         passed+=1
@@ -75,9 +76,7 @@ def test():
         print(e)
     tot+=1 
 
-    model.load_state_dict(torch.load("definitive1"))
     images = None
-    heatmaps = None
 
     try:
         row = next(iter(data_loader))

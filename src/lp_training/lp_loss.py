@@ -48,7 +48,7 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 
     # Second term L
 
-    # Efficient way to implement the difference of every couple of n elements array :)
+    # Efficient way to implement the difference of every couple of n elements array
 
     repMatrix = mean_h.expand(batch_size, max_person, max_person).float()
 
@@ -65,18 +65,18 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
     return tagexp+tagmse
 
 def computeLoss(y_preds, gtHeatmaps, gtMask, gtJoints):
-    heatmapLosses = []
-    tagLosses = []
+    heatmapLoss = 0
+    tLoss = 0
     for n, heatmap_pred in enumerate(y_preds):
         heatmap_true = gtHeatmaps[n]
         joints_true = gtJoints[n]
         mask_true = gtMask[n]
         if(heatmap_pred != None):
             heatmaps_rest = heatmap_pred[:, :config["num_joints"]]
-            heatmapLosses.append(heatmapMSE(heatmaps_rest, heatmap_true, mask_true))
+            heatmapLoss += heatmapMSE(heatmaps_rest, heatmap_true, mask_true)
 
             tag_rest = heatmap_pred[:, config["num_joints"]:]
 
-            tagLosses.append(tagLoss(tag_rest, joints_true) * config["tag_loss_weight"])
+            tLoss += tagLoss(tag_rest, joints_true) * config["tag_loss_weight"]
 
-    return heatmapLosses, tagLosses
+    return heatmapLoss, tLoss

@@ -33,9 +33,10 @@ def train(batch_size):
     start_time = time.time()
 
     for i in range(config["epochs"]):
-        train_loss = trainOneEpoch(model, data_loader, optimizer, i)
-        val_loss_avg = 0
-        val_loss_l = []
+        tot_loss, heatmap_loss, tag_loss = trainOneEpoch(model, data_loader, optimizer, i)
+        loss_tot_l = []
+        loss_hm_l = []
+        loss_t_l = []
         with torch.no_grad():
             model.eval()
             for images, heatmaps, masks, joints in tqdm.tqdm(val_data_loader):
@@ -45,21 +46,22 @@ def train(batch_size):
                 masks = [m.to(config["device"]) for m in masks]
                 y_pred = model(images)
 
-                heatmapLoss, tagLoss = computeLoss(y_pred, heatmaps, masks, joints)
-                totLoss = 0
-                
-                for scaleIdx in range(len(heatmapLoss)):
-                    hl = heatmapLoss[scaleIdx].mean(0)
-                    totLoss+=hl
-                    tl = tagLoss[scaleIdx].mean(0)
-                    totLoss+=tl
+                heatmapLoss_val, tagLoss_val = computeLoss(y_pred, heatmaps, masks, joints)
+                heatmapLoss_val = heatmapLoss_val.mean(0)
+                tagLoss_val = tagLoss_val.mean(0)
+                totLoss_val = heatmapLoss_val+tagLoss_val
 
-                val_loss_l.append(totLoss)
-            val_loss_avg = sum(val_loss_l)/len(val_loss_l)
+                loss_tot_l.append(float(totLoss_val))
+                loss_hm_l.append(float(heatmapLoss_val))
+                loss_t_l.append(float(tagLoss_val))
+        
+        avgLossTot_val = sum(loss_tot_l)/len(loss_tot_l)
+        avgLossHm_val = sum(loss_hm_l)/len(loss_hm_l)
+        avgLossT_val = sum(loss_t_l)/len(loss_t_l)
 
-        print(f"epoch #{i+1} training loss {train_loss}   validation loss {val_loss_avg}")
+        print(f"epoch #{i+1} \n\nTRAINING LOSS:\ntotal Loss = {tot_loss}\nheatmap Loss = {heatmap_loss}\ntag Loss = {tag_loss}\n\nVALIDATION LOSS:\ntotal Loss = {avgLossTot_val}\nheatmap Loss = {avgLossHm_val}\ntag Loss = {avgLossT_val}\n\n\n")
 
-        if(es(val_loss_avg)):
+        if(es(avgLossTot_val)):
             break
     
-    print(f"end training, exec time: {str(time.time() - start_time)} seconds, final validation loss: {val_loss_avg}")
+    print(f"end training, exec time: {str(time.time() - start_time)}")
