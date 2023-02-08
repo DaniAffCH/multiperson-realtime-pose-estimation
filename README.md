@@ -34,7 +34,7 @@ crowdpose
     └── crowdpose_val.json
 ```
 
-Finally edit `src/lp_config/lp_common_config.py` and modify the variable `dataset_root` with your installation path. 
+Finally edit `src/lp_config/lp_common_config.py` and modify the variable `dataset_root` with your installation path (default is `~/dataset/crowdpose`). 
 To check if the installation was successful you can run `python3 main.py --test`, if it passes all the test cases then the set up is working correctly.
 
 ## Usage 
