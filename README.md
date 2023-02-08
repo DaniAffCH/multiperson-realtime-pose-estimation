@@ -10,6 +10,32 @@ MobileNet structure with large kernels deconvolution is used as backbone.
 ![Network Architecture!](/assets/structure.png)
 
 ## Installation
+Clone the repository:
+```
+git clone https://github.com/DaniAffCH/litepose-pose-estimation
+```
+
+Install python requirements:
+```
+pip3 install -r requirements.txt
+```
+
+Download both annotation and images of CrowdPose Dataset from [the official repositoy](https://github.com/Jeff-sjtu/CrowdPose#dataset). 
+Then recreate a directory structure as:
+```
+crowdpose
+├─── images
+│    ├── 112934.jpg
+│   ...
+└── json
+    ├── crowdpose_test.json
+    ├── crowdpose_train.json
+    ├── crowdpose_trainval.json
+    └── crowdpose_val.json
+```
+
+Finally edit `src/lp_config/lp_common_config.py` and modify the variable `dataset_root` with your installation path. 
+To check if the installation was successful you can run `python3 main.py --test`, if it passes all the test cases then the set up is working correctly.
 
 ## Usage 
 
