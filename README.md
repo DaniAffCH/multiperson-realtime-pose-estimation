@@ -42,6 +42,13 @@ To check if the installation was successful you can run `python3 main.py --test`
 
 ## Usage 
 
+Every settings can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference.
+
+For training run:
+```python3 main.py --train```
+
+`demo.ipynb` is a notebook that shows an example of code usage.
+
 ## Acknowledgements
 This work is based on [LitePose][2] paper and [HigherHRNet][3]. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
 
