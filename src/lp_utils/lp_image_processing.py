@@ -35,7 +35,17 @@ def drawKeypoints(img, keypoints):
     colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
     for kp in keypoints:
         for n,person in enumerate(kp):
-            img = cv2.circle(img, (int(person[0]),int(person[1])), radius=3, color=(0, 0, 255), thickness=-1)
+            img = cv2.circle(img, (person["x"],person["y"]), radius=3, color=(0, 0, 255), thickness=-1)
+    return img
+
+def drawSkeleton(img, edgelist):
+    img = img.cpu().numpy().transpose(1, 2, 0)
+    img = normalizeImage(img)
+    img = img.astype(np.uint8).copy() 
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
+    for edge in edgelist:
+        img = cv2.line(img, (edge["xf"], edge["yf"]), (edge["xt"], edge["yt"]), color=(0, 0, 255), thickness=5)
     return img
 
 def drawHeatmap(img, heatmaps):

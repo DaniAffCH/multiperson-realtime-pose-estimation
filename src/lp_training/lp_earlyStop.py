@@ -9,11 +9,10 @@ class EarlyStopping():
         self.model = model
         self.best = torch.inf
     def __call__(self, loss):
-        if loss < self.best:
+        if loss < self.best - self.eps:
             torch.save(self.model.state_dict(), self.savePath)
-            if loss < self.best - self.eps:
-                self.count = 0
-                self.best = loss
+            self.count = 0
+            self.best = loss
         else:
             self.count += 1
             if self.count > self.threshold:

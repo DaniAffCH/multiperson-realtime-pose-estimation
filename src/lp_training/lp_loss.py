@@ -54,11 +54,11 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 
     repMatrixTrasnspose = repMatrix.transpose(1,2)
 
-    diffElementwise = torch.square(repMatrix-repMatrixTrasnspose) # symmetric matrices, this can be improved by exploiting this property 
+    diffElementwise = torch.square(repMatrix-repMatrixTrasnspose) # symmetric matrices, this can be improved by exploiting this property (still O(n^2))
 
-    diffElementwise *= -1/(2*OMEGA)
+    diffElementwise *= 1/(2*OMEGA)
 
-    diffElementwise = torch.exp(diffElementwise)
+    diffElementwise = 1/torch.exp(diffElementwise)
 
     tagexp = diffElementwise.mean(2).mean(1)
 
@@ -67,6 +67,7 @@ def tagLoss(tags, gtJoints, OMEGA = 1):
 def computeLoss(y_preds, gtHeatmaps, gtMask, gtJoints):
     heatmapLoss = 0
     tLoss = 0
+    n = 0
     for n, heatmap_pred in enumerate(y_preds):
         heatmap_true = gtHeatmaps[n]
         joints_true = gtJoints[n]
@@ -76,7 +77,8 @@ def computeLoss(y_preds, gtHeatmaps, gtMask, gtJoints):
             heatmapLoss += heatmapMSE(heatmaps_rest, heatmap_true, mask_true)
 
             tag_rest = heatmap_pred[:, config["num_joints"]:]
-
-            tLoss += tagLoss(tag_rest, joints_true) * config["tag_loss_weight"]
+            if n < 1:
+                tLoss += tagLoss(tag_rest, joints_true) * config["tag_loss_weight"]
+        n+=1
 
     return heatmapLoss, tLoss
