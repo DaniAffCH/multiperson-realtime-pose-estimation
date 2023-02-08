@@ -49,6 +49,11 @@ For training run:
 python3 main.py --train
 ```
 
+For inference run:
+```
+python3 main.py --inference
+```
+
 `demo.ipynb` is a notebook that shows an example of code usage.
 
 ## Acknowledgements
