@@ -45,7 +45,9 @@ To check if the installation was successful you can run `python3 main.py --test`
 Every settings can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference.
 
 For training run:
-```python3 main.py --train```
+```
+python3 main.py --train
+```
 
 `demo.ipynb` is a notebook that shows an example of code usage.
 
