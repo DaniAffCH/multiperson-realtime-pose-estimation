@@ -2,6 +2,9 @@
 
 LitePose is an efficient and scale invariant multi-person pose estimation model. Its light architecture allows to perform real-time inference with low computational power devices such as smartphones. This is a simpler reimplementation of the original [LitePose][1].
 
+![Network Architecture!](/assets/keypoints.png)
+
+
 ## How does it work?
 
 LitePose follows a bottom-up pose estimation approach. The single-branch architecture ensures high efficiency, while the Fusion Deconv Head implements the scale invariance by using high resolution features.
