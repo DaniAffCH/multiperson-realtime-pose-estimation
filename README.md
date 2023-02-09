@@ -20,7 +20,7 @@ git clone https://github.com/DaniAffCH/litepose-pose-estimation
 
 Install python requirements:
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 Download both annotations and images of CrowdPose Dataset from [the official repository](https://github.com/Jeff-sjtu/CrowdPose#dataset). 
@@ -46,12 +46,12 @@ Every settings can be modified in `src/lp_config` where there are `lp_model_conf
 
 For training run:
 ```
-python3 main.py --train
+python main.py --train
 ```
 
 For inference run:
 ```
-python3 main.py --inference
+python main.py --inference
 ```
 
 `demo.ipynb` is a notebook that shows an example of code usage.
