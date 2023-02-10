@@ -54,7 +54,7 @@ For inference run:
 python main.py --inference
 ```
 
-`demo.ipynb` is a notebook that shows an example of code usage.
+`demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
 
 ## Acknowledgements
 This work is based on [LitePose][2] paper and [HigherHRNet][3]. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
