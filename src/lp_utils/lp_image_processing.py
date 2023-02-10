@@ -45,7 +45,7 @@ def drawSkeleton(img, edgelist):
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     colors = [(0, 0, 255), (0, 255, 0), (255, 0, 0)]
     for edge in edgelist:
-        img = cv2.line(img, (edge["xf"], edge["yf"]), (edge["xt"], edge["yt"]), color=(0, 0, 255), thickness=5)
+        img = cv2.line(img, (edge["xf"], edge["yf"]), (edge["xt"], edge["yt"]), color=(0, 255, 0), thickness=3)
     return img
 
 def drawHeatmap(img, heatmaps):

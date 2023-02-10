@@ -1,84 +1,79 @@
 import numpy as np
 import torch
 from lp_config.lp_common_config import config
+from torch import nn
 
-def heatmapMSE(y_pred, y_true, mask):
-    assert y_pred.size() == y_true.size()
+class Lp_Loss(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
 
-    loss = ((y_pred - y_true)**2) * mask[:, None, :, :].expand_as(y_pred)
-    return loss.mean(dim=3).mean(dim=2).mean(dim=1)
+    def heatmapMSE(self, y_pred, y_true, mask):
+        loss = ((y_pred - y_true)**2) * mask[:, None, :, :].expand_as(y_pred)
+        return loss.mean(dim=3).mean(dim=2).mean(dim=1)
 
-def tagLoss(tags, gtJoints, OMEGA = 1):
-    outtags = tags.contiguous().view(tags.size()[0], -1)
+    def tagLoss(self, pred_tag_map, joints):
+        if pred_tag_map.dim() == 3:
+            pred_tag_map = pred_tag_map.squeeze(2)
 
-    batch_size, max_person, num_joints = int(gtJoints.shape[0]), int(gtJoints.shape[1]), int(gtJoints.shape[2])
+        batch_size, max_person, num_joints = int(joints.shape[0]), int(joints.shape[1]), int(joints.shape[2])
 
-    validJoints = gtJoints[:, :, :, 1].float()
-    jointsValue = gtJoints[:, :, :, 0].reshape(batch_size, -1).long()
+        joints_vis = joints[:, :, :, 1].float()
+        person_joints_cnt = joints_vis.sum(2, keepdim=True)
+        joints_loc = joints[:, :, :, 0].reshape(batch_size, -1).long()
 
-    joint_perPerson = validJoints.sum(2, keepdim=True)
+        tags = torch.gather(pred_tag_map, index=joints_loc, dim=1)
+        tags = tags.reshape(batch_size, max_person, num_joints) * joints_vis
 
-    tags = torch.gather(outtags, index=jointsValue, dim=1)
-    tags = tags.reshape(batch_size, max_person, num_joints)
+        person_cnt = (person_joints_cnt > 0).float().squeeze(2).sum(dim=1, keepdim=True)
+        person_cnt[person_cnt == 0] = 1
+        person_vis = (person_joints_cnt > 0).expand(batch_size, max_person, max_person).float()
+        person_vis = person_vis * person_vis.permute(0, 2, 1)
+        person_joints_cnt[person_joints_cnt == 0] = 1
 
-    realtags = tags*validJoints
+        # Minimize variance on each person
+        tags_mean = tags.sum(2, keepdim=True) / person_joints_cnt
+        assert torch.isnan(tags_mean).sum() == 0
 
-    person_cnt = (joint_perPerson > 0).float().squeeze(2).sum(dim=1, keepdim=True) 
+        pull = torch.sum(joints_vis * (tags - tags_mean) ** 2, dim=2, keepdim=True) / person_joints_cnt
+        pull[person_joints_cnt == 0] = 0
 
-    person_cnt[person_cnt == 0] = 1
-    joint_perPerson[joint_perPerson==0]=1
+        pull = pull.squeeze(2).sum(1, keepdim=True) / person_cnt
+        pull = torch.mean(pull)
 
-    # Hn line in the paper
+        # Maximize mean distance between peoples
+        tags_mean = (tags_mean).expand(batch_size, max_person, max_person) 
+        diff = (tags_mean - tags_mean.permute(0, 2, 1)) * person_vis
 
-    mean_h = realtags.sum(2, keepdim=True)
-    mean_h = mean_h/joint_perPerson
-    mean_h = mean_h.nan_to_num(0)
+        diff = torch.exp(- diff ** 2) * person_vis
+        diff = 0.5 * (torch.sum(diff, dim=(1, 2)) - person_cnt.squeeze(1)) / torch.clamp((person_cnt - 1) * person_cnt, min=1).squeeze(1)
+        diff[person_cnt.squeeze(1) < 2] = 0
 
-    # First term L
+        push = torch.mean(diff)
 
-    diff = (mean_h-realtags)**2
-    diff *= validJoints
+        return push+pull
+    
+    def forward(self,y_preds, gtHeatmaps, gtMask, gtJoints):
+        heatmaps_losses = []
+        tag_losses = []
+        f = True
+        for idx in range(len(y_preds)):
+            heatmaps_pred = y_preds[idx][:, :config["num_joints"]]
 
-    aggregate = diff.sum(2, keepdim=True)/joint_perPerson
-    aggregate = aggregate.nan_to_num(0)
+            heatmaps_loss = self.heatmapMSE(heatmaps_pred, gtHeatmaps[idx], gtMask[idx])
+            heatmaps_loss = heatmaps_loss
+            heatmaps_losses.append(heatmaps_loss)
 
-    aggregate = aggregate.squeeze(2).sum(1, keepdim=True)/person_cnt
+            if f:
+                tags_pred = y_preds[idx][:, config["num_joints"]:]
+                batch_size = tags_pred.size()[0]
+                tags_pred = tags_pred.contiguous().view(batch_size, -1, 1)
 
-    tagmse = aggregate.squeeze(1)
+                tag_loss = self.tagLoss(tags_pred, gtJoints[idx])
 
-    # Second term L
+                tag_loss = tag_loss * config["tag_loss_weight"]
 
-    # Efficient way to implement the difference of every couple of n elements array
+                tag_losses.append(tag_loss)
 
-    repMatrix = mean_h.expand(batch_size, max_person, max_person).float()
+            f = False
 
-    repMatrixTrasnspose = repMatrix.transpose(1,2)
-
-    diffElementwise = torch.square(repMatrix-repMatrixTrasnspose) # symmetric matrices, this can be improved by exploiting this property (still O(n^2))
-
-    diffElementwise *= 1/(2*OMEGA)
-
-    diffElementwise = 1/torch.exp(diffElementwise)
-
-    tagexp = diffElementwise.mean(2).mean(1)
-
-    return tagexp+tagmse
-
-def computeLoss(y_preds, gtHeatmaps, gtMask, gtJoints):
-    heatmapLoss = 0
-    tLoss = 0
-    n = 0
-    for n, heatmap_pred in enumerate(y_preds):
-        heatmap_true = gtHeatmaps[n]
-        joints_true = gtJoints[n]
-        mask_true = gtMask[n]
-        if(heatmap_pred != None):
-            heatmaps_rest = heatmap_pred[:, :config["num_joints"]]
-            heatmapLoss += heatmapMSE(heatmaps_rest, heatmap_true, mask_true)
-
-            tag_rest = heatmap_pred[:, config["num_joints"]:]
-            if n < 1:
-                tLoss += tagLoss(tag_rest, joints_true) * config["tag_loss_weight"]
-        n+=1
-
-    return heatmapLoss, tLoss
+        return heatmaps_losses, tag_losses

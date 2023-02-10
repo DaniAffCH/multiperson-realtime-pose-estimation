@@ -179,10 +179,12 @@ class CrowdPoseKeypoints(CrowdPoseDataset):
         return m < 0.5
     
 
-def getDatasetProcessed(split, datasetPath=os.path.join(os.environ.get("HOME"), "dataset/crowdpose")):
+def getDatasetProcessed(split):
 
     if split not in ["train", "validation", "test"]:
         raise Exception(f"Expected a dataset split train, validation or test, given {split}")
+
+    datasetPath = config["dataset_root"]
 
     split = "val" if split == "validation" else "val"
 

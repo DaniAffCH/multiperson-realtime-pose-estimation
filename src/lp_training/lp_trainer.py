@@ -3,7 +3,8 @@ from lp_model.lp_litepose import LitePose
 from lp_config.lp_common_config import config
 from lp_training.lp_earlyStop import EarlyStopping
 from lp_training.lp_trainOne import trainOneEpoch
-from lp_training.lp_loss import computeLoss
+from lp_training.lp_loss import Lp_Loss
+
 import tqdm
 import time
 
@@ -21,7 +22,7 @@ def train(batch_size):
 
     val_data_loader = torch.utils.data.DataLoader(
         val_ds,
-        batch_size=batch_size//2
+        batch_size=batch_size
     )
 
     model = LitePose().to(config["device"])
@@ -32,8 +33,10 @@ def train(batch_size):
 
     start_time = time.time()
 
+    loss_fac = Lp_Loss()
+
     for i in range(config["epochs"]):
-        tot_loss, heatmap_loss, tag_loss = trainOneEpoch(model, data_loader, optimizer, i)
+        tot_loss, heatmap_loss, tag_loss = trainOneEpoch(model, data_loader, optimizer, i,loss_fac)
         loss_tot_l = []
         loss_hm_l = []
         loss_t_l = []
@@ -46,7 +49,9 @@ def train(batch_size):
                 masks = [m.to(config["device"]) for m in masks]
                 y_pred = model(images)
 
-                heatmapLoss_val, tagLoss_val = computeLoss(y_pred, heatmaps, masks, joints)
+                heatmaps_losses, tag_losses = loss_fac(y_pred, heatmaps, masks, joints)
+                heatmapLoss_val = sum(heatmaps_losses)
+                tagLoss_val = sum(tag_losses)
                 heatmapLoss_val = heatmapLoss_val.mean(0)
                 tagLoss_val = tagLoss_val.mean(0)
                 totLoss_val = heatmapLoss_val+tagLoss_val

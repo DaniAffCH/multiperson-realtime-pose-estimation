@@ -95,7 +95,6 @@ def assocEmbedding(kps):
             idxb = ccfg.crowd_pose_part_idx[b]
 
             bcopy = single[idxb].copy()
-            # find all edges a - b
             for elem in single[idxa]:
                 distance, bestMatch, rmidx = getCloserElement(elem["tag"], bcopy)
                 if distance < 1-ccfg.config["confidence_embedding"]:
