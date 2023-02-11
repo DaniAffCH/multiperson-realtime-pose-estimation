@@ -60,8 +60,9 @@ python main.py --train
 
 For inference run:
 ```
-python main.py --inference
+python main.py --inference lp_trained_models/bigarch
 ```
+You can substitute `lp_trained_models/bigarch` with any trained model
 
 The file `demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
 
