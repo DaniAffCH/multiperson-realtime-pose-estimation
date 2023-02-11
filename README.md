@@ -49,7 +49,7 @@ In order to check if the installation was successful you can run `python main.py
 
 Every setting can be modified in `src/lp_config`:
 - `lp_model_config.py` contains the settings about the network architecture.
-- `lp_common_config.py` that contains the general configurations about training and inference.  
+- `lp_common_config.py` contains the general configurations about training and inference.  
 
 If you modify the network structure you have to train the custom network, otherwise pretrained models are available in `src/lp_trained_models`.
 
