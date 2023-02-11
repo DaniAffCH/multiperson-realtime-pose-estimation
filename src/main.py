@@ -10,6 +10,7 @@ from lp_training.lp_trainer import train
 from lp_model.lp_litepose import LitePose
 from lp_coco_utils.lp_getDataset import getDatasetProcessed
 from lp_inference.lp_inference import inference, assocEmbedding
+from lp_testing.lp_evaluate import evaluateModel
 import cv2
 from lp_utils.lp_image_processing import drawHeatmap, drawKeypoints, drawSkeleton
 
@@ -29,8 +30,10 @@ def parse_args():
                         action="store_true")
 
     parser.add_argument('--inference', 
-                        help="perform inference and shows the results",
-                        action="store_true")
+                        help="perform inference and shows the results for the provided model")
+    
+    parser.add_argument('--score', 
+                        help="Comptue OKS score for the provided model")
 
     args = parser.parse_args()
 
@@ -49,9 +52,15 @@ def handleTrain():
 def handleTest():
     test()
 
-def handleInference():
+def handleScore(args):
     model = LitePose().to(config["device"])
-    model.load_state_dict(torch.load("lp_trained_models/bigarch"))
+    model.load_state_dict(torch.load(args.score))
+    res = evaluateModel(model)
+    print(f"Object Keypoint Similarity (OKS) score: {res}")
+
+def handleInference(args):
+    model = LitePose().to(config["device"])
+    model.load_state_dict(torch.load(args.inference))
 
     ds = getDatasetProcessed("train")
 
@@ -102,7 +111,9 @@ def main():
     elif(args.test):
         handleTest()
     elif(args.inference):
-        handleInference()
+        handleInference(args)
+    elif(args.score):
+        handleScore(args)
     
 if __name__ == '__main__':
     main()
