@@ -13,7 +13,7 @@ Keypoint detection                            |  Pose estimation
 ## How does it work?
 
 LitePose follows a bottom-up pose estimation approach. The single-branch architecture ensures high efficiency, while the Fusion Deconv Head implements the scale invariance by using high resolution features.
-MobileNet structure with large kernels deconvolution is used as backbone. The whole network is scalable with respect to the number of joints and the maximum number of people that the image may contain.
+MobileNet structure with large kernels convolution is used as backbone. The whole network is scalable with respect to the number of joints and the maximum number of people that the image may contain.
 
 ![Network Architecture!](/assets/structure.png)
 
@@ -47,7 +47,7 @@ In order to check if the installation was successful you can run `python main.py
 
 ## Usage 
 
-Every settings can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference. 
+Every setting can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference. If you chande the network structure you can't load the pre-trained models provided but you have to train the custom network.
 
 For training run:
 ```
