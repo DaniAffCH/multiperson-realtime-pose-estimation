@@ -62,6 +62,12 @@ For inference run:
 ```
 python main.py --inference lp_trained_models/bigarch
 ```
+
+For model evaluation run:
+```
+python main.py --score lp_trained_models/bigarch
+```
+
 You can replace `lp_trained_models/bigarch` with any trained model
 
 The file `demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
