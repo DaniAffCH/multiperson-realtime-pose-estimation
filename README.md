@@ -1,6 +1,6 @@
 # LitePose pose estimation
 
-LitePose is an efficient and scale invariant multi-person pose estimation model. Its light architecture allows to perform real-time inference with low computational power devices such as smartphones. This is a (non official) implementation of the original [LitePose][1].
+LitePose is an efficient scale invariant multi-person pose estimation model. Its light architecture allows to perform real-time inference with low computational power devices. This is a (non official) implementation of the original [LitePose][1].
 
 
 Keypoint detection                            |  Pose estimation
@@ -47,7 +47,7 @@ In order to check if the installation was successful you can run `python main.py
 
 ## Usage 
 
-Every setting can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference. If you modify the network structure you have to train the custom network, otherwise pretrained models are available in `src/lp_trained_models/`.
+Every setting can be modified in `src/lp_config` where there are `lp_model_config.py` that contains the settings about network architecture and `lp_common_config.py` that contains the general configurations about training and inference. If you modify the network structure you have to train the custom network, otherwise pretrained models are available in `src/lp_trained_models`.
 
 For training run:
 ```
@@ -59,7 +59,7 @@ For inference run:
 python main.py --inference
 ```
 
-`demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
+The file `demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
 
 ## Acknowledgements
 This work is based on [LitePose][2] paper and [HigherHRNet][3] for the network architecture. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
