@@ -62,7 +62,7 @@ python main.py --inference
 `demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
 
 ## Acknowledgements
-This work is based on [LitePose][2] paper and [HigherHRNet][3]. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
+This work is based on [LitePose][2] paper and [HigherHRNet][3] for the network architecture. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
 
 [1]:https://github.com/mit-han-lab/litepose
 [2]:https://openaccess.thecvf.com/content/CVPR2022/papers/Wang_Lite_Pose_Efficient_Architecture_Design_for_2D_Human_Pose_Estimation_CVPR_2022_paper.pdf
