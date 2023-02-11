@@ -51,7 +51,7 @@ def handleTest():
 
 def handleInference():
     model = LitePose().to(config["device"])
-    model.load_state_dict(torch.load("lp_trained_models/mytag"))
+    model.load_state_dict(torch.load("lp_trained_models/bigarch"))
 
     ds = getDatasetProcessed("train")
 

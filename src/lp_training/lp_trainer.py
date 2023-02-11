@@ -11,7 +11,7 @@ import time
 import torch
 
 def train(batch_size):
-    ds = getDatasetProcessed("train")
+    ds = getDatasetProcessed("trainval")
 
     data_loader = torch.utils.data.DataLoader(
         ds,

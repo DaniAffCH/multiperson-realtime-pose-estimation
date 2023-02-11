@@ -43,7 +43,7 @@ def inference(model, images):
         hmavg = hmavg/hmavg.max()
         hmavg = suppression(hmavg)
 
-        tgavg = torch.tensor(tg1)
+        tgavg = torch.tensor((tg1+tg2)/2)
         tgavg = tgavg/tgavg.max()
 
         bkp = []
@@ -93,7 +93,8 @@ def assocEmbedding(kps):
         for a,b in ccfg.crowd_pose_part_orders:
             idxa = ccfg.crowd_pose_part_idx[a]
             idxb = ccfg.crowd_pose_part_idx[b]
-
+            if(len(single) < idxb):
+                continue
             bcopy = single[idxb].copy()
             for elem in single[idxa]:
                 distance, bestMatch, rmidx = getCloserElement(elem["tag"], bcopy)

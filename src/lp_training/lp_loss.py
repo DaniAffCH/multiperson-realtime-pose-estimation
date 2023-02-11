@@ -55,7 +55,6 @@ class Lp_Loss(nn.Module):
     def forward(self,y_preds, gtHeatmaps, gtMask, gtJoints):
         heatmaps_losses = []
         tag_losses = []
-        f = True
         for idx in range(len(y_preds)):
             heatmaps_pred = y_preds[idx][:, :config["num_joints"]]
 
@@ -63,17 +62,15 @@ class Lp_Loss(nn.Module):
             heatmaps_loss = heatmaps_loss
             heatmaps_losses.append(heatmaps_loss)
 
-            if f:
-                tags_pred = y_preds[idx][:, config["num_joints"]:]
-                batch_size = tags_pred.size()[0]
-                tags_pred = tags_pred.contiguous().view(batch_size, -1, 1)
+            tags_pred = y_preds[idx][:, config["num_joints"]:]
+            batch_size = tags_pred.size()[0]
+            tags_pred = tags_pred.contiguous().view(batch_size, -1, 1)
 
-                tag_loss = self.tagLoss(tags_pred, gtJoints[idx])
+            tag_loss = self.tagLoss(tags_pred, gtJoints[idx])
 
-                tag_loss = tag_loss * config["tag_loss_weight"]
+            tag_loss = tag_loss * config["tag_loss_weight"]
 
-                tag_losses.append(tag_loss)
+            tag_losses.append(tag_loss)
 
-            f = False
 
         return heatmaps_losses, tag_losses

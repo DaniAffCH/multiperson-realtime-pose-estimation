@@ -15,11 +15,11 @@ config = dict(
     epochs = 500,
     earlyStop_threshold = 8,
     earlyStop_eps = 1e-8,
-    backup_name = "definitive",
+    backup_name = "bigarch",
     tag_loss_weight = 0.001,
 
     #INFERENCE
-    confidence_threshold = 0.17,
+    confidence_threshold = 0.25,
     confidence_embedding = 0.90,
 )
 

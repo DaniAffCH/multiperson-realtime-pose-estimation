@@ -39,7 +39,9 @@ def drawKeypoints(img, keypoints):
     return img
 
 def drawSkeleton(img, edgelist):
-    img = img.cpu().numpy().transpose(1, 2, 0)
+    if isinstance(img, torch.Tensor):
+        img = img.cpu().numpy()
+    img = img.transpose(1, 2, 0)
     img = normalizeImage(img)
     img = img.astype(np.uint8).copy() 
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
