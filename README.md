@@ -3,9 +3,9 @@
 LitePose is an efficient and scale invariant multi-person pose estimation model. Its light architecture allows to perform real-time inference with low computational power devices such as smartphones. This is a simpler reimplementation of the original [LitePose][1].
 
 
-Keypoint estimation                             |  Pose estimation
-:----------------------------------------------:|:-------------------------------------:
-![Keypoint estimation](/assets/keypoints.png)   |  ![Pose estimation](/assets/pose.png)
+Keypoint detection                            |  Pose estimation
+:--------------------------------------------:|:-------------------------------------:
+![Keypoint detecttion](/assets/keypoints.png) |  ![Pose estimation](/assets/pose.png)
 
 
 
