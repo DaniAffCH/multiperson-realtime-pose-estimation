@@ -20,9 +20,38 @@ def suppression(det):
     return det
     
 @torch.no_grad()
+def getkpsfromhms(hms,scale):
+
+    kps = []
+    for j in range(hms[0].shape[0]):
+        
+        # assuming that 2 training scales are used. This should be generalized 
+        hm1 = ip.scaleImage(hms[0][j], scale).numpy()
+        hm2 = ip.scaleImage(hms[1][j], scale).numpy()
+
+        hmavg = torch.tensor((hm1+hm2)/2)
+        hmavg = hmavg/hmavg.max()
+        hmavg = suppression(hmavg)
+
+        bkp = []
+        # for each joint
+        for joint in hmavg:
+            joint = joint.view(-1)
+            values,idxs = joint.topk(ccfg.config["max_people"])
+            subpeoples = []
+            for n,v in enumerate(values):
+                if v < ccfg.config["confidence_threshold"]:
+                    break
+                x = int(idxs[n]%scale)
+                y = int(idxs[n]/scale)
+                subpeoples.append([x,y])
+            bkp.append(subpeoples)
+        kps.append(bkp)
+    return kps
+
+@torch.no_grad()
 def inference(model, images):
     outputs = model(images)
-    kps = []
     
     outputs = [elem.cpu() for elem in outputs]
 
