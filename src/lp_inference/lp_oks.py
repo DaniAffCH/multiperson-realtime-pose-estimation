@@ -34,8 +34,9 @@ def getOks(model, batch, k=7):
         score = 0
         for j, joint in enumerate(batch):
             gtcpy = gtkeypoints[b][j].copy()
-            for d, detection in enumerate(joint):
+            for detection in enumerate(joint):
                 distance, idx = getCloserDistance(detection, gtcpy)
+                
                 if(idx is None):
                     continue
 
