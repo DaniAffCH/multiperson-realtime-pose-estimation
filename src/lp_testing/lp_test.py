@@ -3,6 +3,7 @@ from lp_model.lp_litepose import LitePose
 from lp_training.lp_trainOne import trainOneEpoch
 from lp_config.lp_common_config import config
 from lp_inference.lp_inference import inference
+from lp_training.lp_loss import Lp_Loss
 import lp_utils.lp_image_processing as ip 
 import torch.nn.functional as F
 import random
@@ -66,8 +67,8 @@ def test():
 
     try:
         optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.5)
-
-        trainOneEpoch(model, data_loader, optimizer, 1, True)
+        loss_fac = Lp_Loss()
+        trainOneEpoch(model, data_loader, optimizer, 1, loss_fac, True)
         print("[TEST] Train step... "+ok)
         passed+=1
 
