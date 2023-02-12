@@ -54,13 +54,13 @@ def handleTest():
 
 def handleScore(args):
     model = LitePose().to(config["device"])
-    model.load_state_dict(torch.load(args.score))
+    model.load_state_dict(torch.load(args.score, map_location=config["device"]))
     res = evaluateModel(model)
     print(f"Object Keypoint Similarity (OKS) score: {res}")
 
 def handleInference(args):
     model = LitePose().to(config["device"])
-    model.load_state_dict(torch.load(args.inference))
+    model.load_state_dict(torch.load(args.inference, map_location=config["device"]))
 
     ds = getDatasetProcessed("train")
 
