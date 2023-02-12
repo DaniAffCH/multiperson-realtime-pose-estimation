@@ -28,7 +28,7 @@ Install python requirements:
 pip install -r requirements.txt
 ```
 
-Download both annotations and images of CrowdPose Dataset from [the official repository](https://github.com/Jeff-sjtu/CrowdPose#dataset). 
+Download both annotations and images of CrowdPose Dataset from [the official repository](https://github.com/Jeff-sjtu/CrowdPose#dataset) and install CrowdPose APIs. 
 Then recreate a directory structure as:
 ```
 crowdpose
