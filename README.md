@@ -12,8 +12,8 @@ Keypoint detection                            |  Pose estimation
 
 ## How does it work?
 
-LitePose follows a bottom-up pose estimation approach. The single-branch architecture ensures high efficiency, while the Fusion Deconv Head implements the scale invariance by using high resolution features.
-MobileNet structure with large kernels convolution is used as backbone. The whole network is scalable with respect to the number of joints and the maximum number of people that the image may contain.
+LitePose follows a bottom-up pose estimation approach. The single-branch architecture ensures high efficiency, whereas the Fusion Deconv Head implements the scale invariance by using high resolution features.
+MobileNet structure with large kernels convolution is used as backbone. The whole network is scalable according to the number of joints and the maximum number of people that the image may contain.
 
 ![Network Architecture!](/assets/structure.png)
 
