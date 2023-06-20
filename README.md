@@ -72,8 +72,14 @@ You can replace `lp_trained_models/bigarch` with any trained model
 
 The file `demo.ipynb` is a notebook that shows an example of code usage and provides further details about the project.
 
+## Contributing
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+This project is licensed under the MIT License.
+
 ## Acknowledgements
-This work is based on [LitePose][2] paper and [HigherHRNet][3] for the network architecture. Moreover it uses the [Associative Embedding][4] to cluster the keypoints.
+This work is based on [LitePose][2] paper and [HigherHRNet][3] for the network architecture. Moreover, it uses the [Associative Embedding][4] to cluster the keypoints.
 
 [1]:https://github.com/mit-han-lab/litepose
 [2]:https://openaccess.thecvf.com/content/CVPR2022/papers/Wang_Lite_Pose_Efficient_Architecture_Design_for_2D_Human_Pose_Estimation_CVPR_2022_paper.pdf
