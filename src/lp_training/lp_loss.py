@@ -40,7 +40,7 @@ class Lp_Loss(nn.Module):
         pull = pull.squeeze(2).sum(1, keepdim=True) / person_cnt
         pull = torch.mean(pull)
 
-        # Maximize mean distance between peoples
+        # Maximize mean distance between people
         tags_mean = (tags_mean).expand(batch_size, max_person, max_person) 
         diff = (tags_mean - tags_mean.permute(0, 2, 1)) * person_vis
 
